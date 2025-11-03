@@ -27,7 +27,7 @@ resource "helm_release" "tfe" {
 
 
   values = [
-    templatefile("${path.module}/scripts/overrides.yaml", {
+    templatefile("${path.module}/overrides.yaml", {
       tag_prefix          = var.tag_prefix
       replica_count       = var.replica_count
       enc_password        = var.tfe_encryption_password
