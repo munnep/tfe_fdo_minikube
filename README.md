@@ -1,10 +1,33 @@
 # Introduction
 
-This repository will create a Terraform Enterprise environment locally. 
-It is tested on MacOS with Minikube as kubernetes environment.  
-Minikube is run on Podman Desktop.  
-Cloudflare is used for DNS record and TFE certificate creation.  
-You must have a cloudflare api token configured with DNS and Tunnel permissions.  
+This repository provides a complete **Terraform Enterprise (TFE) development environment** that runs locally on macOS, designed for testing, development, and learning purposes.
+
+## Architecture Overview
+
+The setup creates a production-like TFE environment using modern containerization and cloud-native technologies:
+
+- **🖥️ Local Development**: Runs entirely on macOS using Podman Desktop plus a local Minikube Kubernetes cluster (Podman driver)
+- **☁️ External Access**: Leverages Cloudflare tunnels for secure external connectivity without port forwarding
+- **🔒 Enterprise Security**: Includes proper SSL certificates and DNS management through Cloudflare
+- **📦 Microservices Architecture**: Deploys TFE alongside supporting services (PostgreSQL, MinIO, Redis) as Kubernetes pods inside Minikube
+
+## Key Components
+
+- **Minikube**: Lightweight local Kubernetes cluster using the Podman driver and CRI-O container runtime
+- **Terraform Enterprise**: Full TFE installation with persistent storage and session management
+- **Cloudflare Integration**: Automated DNS records and secure tunnel connections for external access
+- **Supporting Services**: PostgreSQL (database), MinIO (S3-compatible storage), Redis (caching), and cloudflared (tunnel agent)
+
+## Prerequisites
+
+- macOS with sufficient resources (recommended: 6+ CPU cores, 12+ GB RAM)
+- Cloudflare account with API token (DNS and Tunnel permissions required)
+- Podman Desktop installed and configured  
+
+# Diagram
+![](diagram/diagram_tfe_fdo_minikube.png)  
+
+
 
 # Prepare code
 ## Git
@@ -133,5 +156,5 @@ Note:
 You will need to delete this manually with the command shown after the apply.  
 Default is `cloudflared tunnel delete tfe-tunnel`.  
 
-Also the minikube cluster must be deleted manually.  
+Also the Minikube cluster must be deleted manually.  
 `minikube delete -p tfe`  
