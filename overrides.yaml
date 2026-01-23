@@ -41,10 +41,19 @@ env:
     TFE_CAPACITY_CPU: 2
     TFE_HOSTNAME: ${fqdn}
     TFE_OPERATIONAL_MODE: active-active
+
     TFE_DATABASE_HOST: ${pg_address}
     TFE_DATABASE_NAME: ${pg_dbname}
     TFE_DATABASE_USER: ${pg_user}
     TFE_DATABASE_PARAMETERS: sslmode=disable
+
+    TFE_EXPLORER_DATABASE_USER: ${pg_user}
+    TFE_EXPLORER_DATABASE_PASSWORD: ${pg_password}
+    TFE_EXPLORER_DATABASE_HOST: ${pg_address}
+    TFE_EXPLORER_DATABASE_NAME: "tfe_explorer"
+    TFE_EXPLORER_DATABASE_PARAMETERS: sslmode=disable
+
+
     TFE_OBJECT_STORAGE_TYPE: s3
     TFE_OBJECT_STORAGE_S3_BUCKET: ${s3_bucket}
     TFE_OBJECT_STORAGE_S3_REGION: "justavalue"
@@ -57,6 +66,9 @@ env:
     
     TFE_REDIS_HOST: ${redis_host}:${redis_port}
     TFE_IACT_SUBNETS: "0.0.0.0/0"
+    # TFE_IACT_TOKEN: ""
+    
+
 
   secrets:
     TFE_DATABASE_PASSWORD: ${pg_password}

@@ -10,5 +10,7 @@ originRequest:
 ingress:
   - hostname: ${fqdn}
     service: https://terraform-enterprise:443
+  - hostname: admin-${fqdn}                        # cloudflare cannot use subdomains. Do not try admin.sub.domain.com
+    service: https://terraform-enterprise:8446    
   # Catch-all rule
   - service: http_status:404

@@ -14,6 +14,7 @@ resource "acme_registration" "registration" {
 resource "acme_certificate" "certificate" {
   account_key_pem = acme_registration.registration.account_key_pem
   common_name     = local.fqdn
+  subject_alternative_names = ["admin-${local.fqdn}", local.fqdn]
 
   dns_challenge {
     provider = "cloudflare"

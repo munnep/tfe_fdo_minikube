@@ -27,6 +27,23 @@ resource "kubernetes_persistent_volume_claim" "postgres" {
   }
 }
 
+resource "kubernetes_config_map" "postgres_init" {
+  metadata {
+    name      = "${var.tag_prefix}-postgres-init"
+    namespace = var.namespace
+  }
+  data = {
+    "init-db.sh" = <<-EOF
+      #!/bin/bash
+      set -e
+      psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+        CREATE DATABASE ${var.postgres_db_explorer};
+        GRANT ALL PRIVILEGES ON DATABASE ${var.postgres_db_explorer} TO $POSTGRES_USER;
+      EOSQL
+    EOF
+  }
+}
+
 resource "kubernetes_pod" "postgres" {
   metadata {
     name      = "${var.tag_prefix}-postgres"
@@ -86,12 +103,23 @@ resource "kubernetes_pod" "postgres" {
         name       = "pgdata"
         mount_path = "/var/lib/postgresql/data"
       }
+      volume_mount {
+        name       = "init-scripts"
+        mount_path = "/docker-entrypoint-initdb.d"
+      }
     }
 
     volume {
       name = "pgdata"
       persistent_volume_claim {
         claim_name = kubernetes_persistent_volume_claim.postgres.metadata[0].name
+      }
+    }
+    volume {
+      name = "init-scripts"
+      config_map {
+        name         = kubernetes_config_map.postgres_init.metadata[0].name
+        default_mode = "0755"
       }
     }
     restart_policy = "Always"

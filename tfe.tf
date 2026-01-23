@@ -50,6 +50,8 @@ resource "helm_release" "tfe" {
       registry_images_url = var.registry_images_url
     })
   ]
+
+  timeout = 500
 }
 
 output "tfe_execute_script_to_create_user_admin" {
@@ -58,4 +60,8 @@ output "tfe_execute_script_to_create_user_admin" {
 
 output "tfe_url" {
   value = "https://${local.fqdn}"  
+}
+
+output "tfe_admin_console" {
+  value = "https://admin-${local.fqdn}"  
 }

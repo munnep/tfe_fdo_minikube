@@ -91,6 +91,12 @@ variable "postgres_db" {
   type        = string
 }
 
+variable "postgres_db_explorer" {
+  description = "Second Postgres database name."
+  type        = string
+  default     = "tfe_explorer"
+}
+
 variable "image_postgres" {
   description = "Postgres docker image."
   type        = string

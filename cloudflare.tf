@@ -8,7 +8,7 @@ data "cloudflare_zones" "main" {
 # Create a Cloudflare Zero Trust Tunnel
 resource "cloudflare_zero_trust_tunnel_cloudflared" "tfe_tunnel" {
   account_id = var.cloudflare_account_id
-  name       = "tfe-tunnel"
+  name       = "tfe-tunnel-minikube"
   config_src = "local"
 }
 
@@ -22,6 +22,16 @@ data "cloudflare_zero_trust_tunnel_cloudflared_token" "tfe_tunnel_token" {
 resource "cloudflare_dns_record" "tunnel_dns" {
   zone_id = data.cloudflare_zones.main.result.0.id
   name    = local.fqdn
+  type    = "CNAME"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.tfe_tunnel.id}.cfargotunnel.com"
+  ttl     = 1
+  proxied = true
+}
+
+# Create the DNS record pointing to the tunnel
+resource "cloudflare_dns_record" "tunnel_dns_admin" {
+  zone_id = data.cloudflare_zones.main.result.0.id
+  name    = "admin-${local.fqdn}"
   type    = "CNAME"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.tfe_tunnel.id}.cfargotunnel.com"
   ttl     = 1

@@ -75,6 +75,11 @@ Start minikube with additional parameters:
 minikube start -p tfe --driver=podman --container-runtime=cri-o --kubernetes-version=v1.34.0 --cpus=4 --memory=8192
 ```
 
+Stop minikube:  
+```
+minikube stop -p tfe
+```
+
 This will put the config in kubectl automatically so the kubernetes provider can use it.  
 Add the full path of the config file to the variable `kubectl_config_path` in `variables.auto.tfvars`
 
@@ -154,7 +159,10 @@ The command is given in the output with `tfe_execute_script_to_create_user_admin
 Note:  
 `terraform destroy` will not destroy the cloudflare tunnel.  
 You will need to delete this manually with the command shown after the apply.  
-Default is `cloudflared tunnel delete tfe-tunnel`.  
+Default is `cloudflared tunnel delete tfe-tunnel-minikube`.  
+
+The UI interface cloudflare tunnel:  
+![](media/2026-01-23-13-01-37.png)  
 
 Also the Minikube cluster must be deleted manually.  
 `minikube delete -p tfe`  
