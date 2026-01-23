@@ -36,7 +36,7 @@ done
 # Get activation token
 echo "Getting the initial activation token"
 INITIAL_TOKEN=`curl -s https://$HOSTNAME/admin/retrieve-iact`
-# INITIAL_TOKEN="WsV0Y97rEecQNQ.atlasv1.s7JVm8NaReHpIx99gyY0Mezgcgxy3bzGytUFsORvBpc1hbt28RY8urw9eUwf2Rgd840"
+
 
 # Create iser admin and get the token
 echo "Create the first user called admin and geting the token"
