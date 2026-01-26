@@ -1,5 +1,5 @@
 
-resource "kubernetes_secret" "postgres" {
+resource "kubernetes_secret_v1" "postgres" {
   metadata {
     name      = "${var.tag_prefix}-postgres-secret"
     namespace = var.namespace
@@ -12,7 +12,7 @@ resource "kubernetes_secret" "postgres" {
   type = "Opaque"
 }
 
-resource "kubernetes_persistent_volume_claim" "postgres" {
+resource "kubernetes_persistent_volume_claim_v1" "postgres" {
   metadata {
     name      = "${var.tag_prefix}-postgres-pvc"
     namespace = var.namespace
@@ -27,7 +27,7 @@ resource "kubernetes_persistent_volume_claim" "postgres" {
   }
 }
 
-resource "kubernetes_config_map" "postgres_init" {
+resource "kubernetes_config_map_v1" "postgres_init" {
   metadata {
     name      = "${var.tag_prefix}-postgres-init"
     namespace = var.namespace
@@ -44,7 +44,7 @@ resource "kubernetes_config_map" "postgres_init" {
   }
 }
 
-resource "kubernetes_pod" "postgres" {
+resource "kubernetes_pod_v1" "postgres" {
   metadata {
     name      = "${var.tag_prefix}-postgres"
     namespace = var.namespace
@@ -61,7 +61,7 @@ resource "kubernetes_pod" "postgres" {
         name = "POSTGRES_USER"
         value_from {
           secret_key_ref {
-            name = kubernetes_secret.postgres.metadata[0].name
+            name = kubernetes_secret_v1.postgres.metadata[0].name
             key  = "POSTGRES_USER"
           }
         }
@@ -70,7 +70,7 @@ resource "kubernetes_pod" "postgres" {
         name = "POSTGRES_PASSWORD"
         value_from {
           secret_key_ref {
-            name = kubernetes_secret.postgres.metadata[0].name
+            name = kubernetes_secret_v1.postgres.metadata[0].name
             key  = "POSTGRES_PASSWORD"
           }
         }
@@ -79,7 +79,7 @@ resource "kubernetes_pod" "postgres" {
         name = "POSTGRES_DB"
         value_from {
           secret_key_ref {
-            name = kubernetes_secret.postgres.metadata[0].name
+            name = kubernetes_secret_v1.postgres.metadata[0].name
             key  = "POSTGRES_DB"
           }
         }
@@ -112,13 +112,13 @@ resource "kubernetes_pod" "postgres" {
     volume {
       name = "pgdata"
       persistent_volume_claim {
-        claim_name = kubernetes_persistent_volume_claim.postgres.metadata[0].name
+        claim_name = kubernetes_persistent_volume_claim_v1.postgres.metadata[0].name
       }
     }
     volume {
       name = "init-scripts"
       config_map {
-        name         = kubernetes_config_map.postgres_init.metadata[0].name
+        name         = kubernetes_config_map_v1.postgres_init.metadata[0].name
         default_mode = "0755"
       }
     }
@@ -126,7 +126,7 @@ resource "kubernetes_pod" "postgres" {
   }
 }
 
-resource "kubernetes_service" "postgres" {
+resource "kubernetes_service_v1" "postgres" {
   metadata {
     name      = "${var.tag_prefix}-postgres"
     namespace = var.namespace
@@ -153,5 +153,5 @@ resource "kubernetes_service" "postgres" {
 # }
 
 output "postgres_url" {
-  value = "postgresql://${var.postgres_user}:${var.postgres_password}@localhost:${kubernetes_service.postgres.spec[0].port[0].port}/${var.postgres_db}"  
+  value = "postgresql://${var.postgres_user}:${var.postgres_password}@localhost:${kubernetes_service_v1.postgres.spec[0].port[0].port}/${var.postgres_db}"  
 }

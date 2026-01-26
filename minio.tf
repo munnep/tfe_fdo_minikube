@@ -1,5 +1,5 @@
 # Root + app credentials secret
-resource "kubernetes_secret" "minio_root" {
+resource "kubernetes_secret_v1" "minio_root" {
   metadata {
     name      = "${var.tag_prefix}-minio-root-credentials"
     namespace = var.namespace
@@ -13,7 +13,7 @@ resource "kubernetes_secret" "minio_root" {
   type = "Opaque"
 }
 
-resource "kubernetes_persistent_volume_claim" "minio" {
+resource "kubernetes_persistent_volume_claim_v1" "minio" {
   metadata {
     name      = "${var.tag_prefix}-minio-pvc"
     namespace = var.namespace
@@ -28,7 +28,7 @@ resource "kubernetes_persistent_volume_claim" "minio" {
   }
 }
 
-resource "kubernetes_pod" "minio" {
+resource "kubernetes_pod_v1" "minio" {
   metadata {
     name      = "${var.tag_prefix}-minio"
     namespace = var.namespace
@@ -47,7 +47,7 @@ resource "kubernetes_pod" "minio" {
         name = "MINIO_ROOT_USER"
         value_from {
           secret_key_ref {
-            name = kubernetes_secret.minio_root.metadata[0].name
+            name = kubernetes_secret_v1.minio_root.metadata[0].name
             key  = "rootUser"
           }
         }
@@ -56,7 +56,7 @@ resource "kubernetes_pod" "minio" {
         name = "MINIO_ROOT_PASSWORD"
         value_from {
           secret_key_ref {
-            name = kubernetes_secret.minio_root.metadata[0].name
+            name = kubernetes_secret_v1.minio_root.metadata[0].name
             key  = "rootPassword"
           }
         }
@@ -97,7 +97,7 @@ resource "kubernetes_pod" "minio" {
         name = "MINIO_ROOT_USER"
         value_from {
           secret_key_ref {
-            name = kubernetes_secret.minio_root.metadata[0].name
+            name = kubernetes_secret_v1.minio_root.metadata[0].name
             key  = "rootUser"
           }
         }
@@ -106,7 +106,7 @@ resource "kubernetes_pod" "minio" {
         name = "MINIO_ROOT_PASSWORD"
         value_from {
           secret_key_ref {
-            name = kubernetes_secret.minio_root.metadata[0].name
+            name = kubernetes_secret_v1.minio_root.metadata[0].name
             key  = "rootPassword"
           }
         }
@@ -115,7 +115,7 @@ resource "kubernetes_pod" "minio" {
         name = "APP_ACCESS_KEY"
         value_from {
           secret_key_ref {
-            name = kubernetes_secret.minio_root.metadata[0].name
+            name = kubernetes_secret_v1.minio_root.metadata[0].name
             key  = "appAccessKey"
           }
         }
@@ -124,7 +124,7 @@ resource "kubernetes_pod" "minio" {
         name = "APP_SECRET_KEY"
         value_from {
           secret_key_ref {
-            name = kubernetes_secret.minio_root.metadata[0].name
+            name = kubernetes_secret_v1.minio_root.metadata[0].name
             key  = "appSecretKey"
           }
         }
@@ -187,14 +187,14 @@ resource "kubernetes_pod" "minio" {
     volume {
       name = "data"
       persistent_volume_claim {
-        claim_name = kubernetes_persistent_volume_claim.minio.metadata[0].name
+        claim_name = kubernetes_persistent_volume_claim_v1.minio.metadata[0].name
       }
     }
   }
 }
 
 # Service
-resource "kubernetes_service" "minio" {
+resource "kubernetes_service_v1" "minio" {
   metadata {
     name      = "${var.tag_prefix}-minio"
     namespace = var.namespace
@@ -227,7 +227,7 @@ resource "kubernetes_service" "minio" {
 # }
 
 output "minio_console_url" {
-  value = "http://localhost:${kubernetes_service.minio.spec[0].port[1].port}/"  
+  value = "http://localhost:${kubernetes_service_v1.minio.spec[0].port[1].port}/"  
 }
 
 output "minio_user" {

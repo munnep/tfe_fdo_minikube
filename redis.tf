@@ -1,4 +1,4 @@
-resource "kubernetes_pod" "redis" {
+resource "kubernetes_pod_v1" "redis" {
   metadata {
     name      = "${var.tag_prefix}-redis"
     namespace = var.namespace
@@ -37,7 +37,7 @@ resource "kubernetes_pod" "redis" {
   }
 }
 
-resource "kubernetes_service" "redis" {
+resource "kubernetes_service_v1" "redis" {
   metadata {
     name      = "${var.tag_prefix}-redis"
     namespace = var.namespace
