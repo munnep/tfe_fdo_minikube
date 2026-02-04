@@ -166,3 +166,14 @@ The UI interface cloudflare tunnel:
 
 Also the Minikube cluster must be deleted manually.  
 `minikube delete -p tfe`  
+
+
+## Proxy pod (squid server)
+
+A Squid proxy server can be deployed in the cluster on port 3128. This can be useful for testing TFE in environments that require outbound traffic to go through a proxy.
+
+Add the variable 
+```
+enable_proxy = true
+```
+

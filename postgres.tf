@@ -2,7 +2,7 @@
 resource "kubernetes_secret_v1" "postgres" {
   metadata {
     name      = "${var.tag_prefix}-postgres-secret"
-    namespace = var.namespace
+    namespace = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
   }
   data = {
     POSTGRES_USER     = var.postgres_user
@@ -15,7 +15,7 @@ resource "kubernetes_secret_v1" "postgres" {
 resource "kubernetes_persistent_volume_claim_v1" "postgres" {
   metadata {
     name      = "${var.tag_prefix}-postgres-pvc"
-    namespace = var.namespace
+    namespace = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
   }
   spec {
     access_modes = ["ReadWriteOnce"]
@@ -30,7 +30,7 @@ resource "kubernetes_persistent_volume_claim_v1" "postgres" {
 resource "kubernetes_config_map_v1" "postgres_init" {
   metadata {
     name      = "${var.tag_prefix}-postgres-init"
-    namespace = var.namespace
+    namespace = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
   }
   data = {
     "init-db.sh" = <<-EOF
@@ -47,7 +47,7 @@ resource "kubernetes_config_map_v1" "postgres_init" {
 resource "kubernetes_pod_v1" "postgres" {
   metadata {
     name      = "${var.tag_prefix}-postgres"
-    namespace = var.namespace
+    namespace = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
     labels    = { app = "postgres" }
   }
   spec {
@@ -129,7 +129,7 @@ resource "kubernetes_pod_v1" "postgres" {
 resource "kubernetes_service_v1" "postgres" {
   metadata {
     name      = "${var.tag_prefix}-postgres"
-    namespace = var.namespace
+    namespace = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
     labels    = { app = "postgres" }
   }
   spec {

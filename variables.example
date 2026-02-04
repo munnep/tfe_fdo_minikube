@@ -31,3 +31,7 @@ admin_password          = "secret$321"                 # Password for TFE admin 
 tfe_encryption_password = "secret$321"                 # Encryption password for TFE
 release_sequence        = "1.0.2"                      # TFE release sequence
 tfe_raw_license         = "xxxxxxxx"                   # License string for TFE
+
+# Proxy
+enable_proxy = true
+image_squid = "docker.io/ubuntu/squid:latest"

@@ -108,6 +108,19 @@ variable "image_redis" {
   type        = string
 }
 
+# Squid
+variable "image_squid" {
+  description = "Squid proxy docker image."
+  type        = string
+  default     = "docker.io/ubuntu/squid:latest"
+}
+
+variable "enable_proxy" {
+  description = "Enable the Squid proxy server and configure TFE to use it."
+  type        = bool
+  default     = false
+}
+
 # TFE
 variable "tfe_encryption_password" {
   description = "Password used to encrypt TFE data."

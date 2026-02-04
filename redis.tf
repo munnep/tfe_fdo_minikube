@@ -1,7 +1,7 @@
 resource "kubernetes_pod_v1" "redis" {
   metadata {
     name      = "${var.tag_prefix}-redis"
-    namespace = var.namespace
+    namespace = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
     labels    = { app = "redis" }
   }
   spec {
@@ -40,7 +40,7 @@ resource "kubernetes_pod_v1" "redis" {
 resource "kubernetes_service_v1" "redis" {
   metadata {
     name      = "${var.tag_prefix}-redis"
-    namespace = var.namespace
+    namespace = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
   }
   spec {
     selector = { app = "redis" }

@@ -17,11 +17,13 @@ resource "kubernetes_secret_v1" "terraform-enterprise" {
   }
 }
 
+
+
 resource "helm_release" "tfe" {
   name            = "${var.tag_prefix}-tfe"
   repository      = "https://helm.releases.hashicorp.com"
   chart           = "terraform-enterprise"
-  namespace       = var.namespace
+  namespace       = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
   version         = "1.6.5"
   cleanup_on_fail = true
 
@@ -34,20 +36,22 @@ resource "helm_release" "tfe" {
       pg_dbname           = kubernetes_secret_v1.postgres.data.POSTGRES_DB
       pg_user             = kubernetes_secret_v1.postgres.data.POSTGRES_USER
       pg_password         = kubernetes_secret_v1.postgres.data.POSTGRES_PASSWORD
-      pg_address          = "${kubernetes_service_v1.postgres.metadata[0].name}.${var.namespace}.svc.cluster.local:${kubernetes_service_v1.postgres.spec[0].port[0].port}"
+      pg_address          = "${kubernetes_service_v1.postgres.metadata[0].name}.${kubernetes_namespace_v1.terraform_enterprise.metadata.0.name}.svc.cluster.local:${kubernetes_service_v1.postgres.spec[0].port[0].port}"
       fqdn                = local.fqdn
       s3_bucket           = "${var.tag_prefix}-bucket"
       s3_bucket_key       = kubernetes_secret_v1.minio_root.data.appAccessKey
       s3_bucket_secret    = kubernetes_secret_v1.minio_root.data.appSecretKey
-      s3_endpoint         = "http://${kubernetes_service_v1.minio.metadata[0].name}.${var.namespace}.svc.cluster.local:${kubernetes_service_v1.minio.spec[0].port[0].port}"
+      s3_endpoint         = "http://${kubernetes_service_v1.minio.metadata[0].name}.${kubernetes_namespace_v1.terraform_enterprise.metadata.0.name}.svc.cluster.local:${kubernetes_service_v1.minio.spec[0].port[0].port}"
       cert_data           = base64encode("${acme_certificate.certificate.certificate_pem}${acme_certificate.certificate.issuer_pem}")
       key_data            = base64encode(nonsensitive(acme_certificate.certificate.private_key_pem))
       ca_cert_data        = base64encode("${acme_certificate.certificate.certificate_pem}${acme_certificate.certificate.issuer_pem}")
-      redis_host          = "${var.tag_prefix}-redis.${var.namespace}.svc.cluster.local"
+      redis_host          = "${var.tag_prefix}-redis.${kubernetes_namespace_v1.terraform_enterprise.metadata.0.name}.svc.cluster.local"
       redis_port          = "6379"
       tfe_license         = var.tfe_raw_license
       tfe_release         = var.release_sequence
       registry_images_url = var.registry_images_url
+      enable_proxy        = var.enable_proxy
+      namespace           = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
     })
   ]
 
