@@ -55,7 +55,7 @@ with Diagram(
                 cloudflared_pod = Pod("cloudflared\n(tunnel)")
                 tfe_pod = Pod("TFE\n(Terraform Enterprise)")
                 postgres_pod = Postgresql("PostgreSQL\n(database)")
-                minio_pod = S3("MinIO\n(S3-compatible storage)")
+                seaweedfs_pod = S3("seaweedfs\n(S3-compatible storage)")
                 redis_pod = Redis("Redis\n(cache/session store)")
 
     # Relationships
@@ -66,9 +66,9 @@ with Diagram(
     vm_backend >> Edge(label="hosts") >> linux_vm
     linux_vm >> Edge(label="runs") >> podman_runtime
     podman_runtime >> Edge(label="hosts (driver)") >> minikube
-    minikube >> [cloudflared_pod, tfe_pod, postgres_pod, minio_pod, redis_pod]
+    minikube >> [cloudflared_pod, tfe_pod, postgres_pod, seaweedfs_pod, redis_pod]
     
     # Internal pod relationships
     tfe_pod >> Edge(label="connects to") >> postgres_pod
-    tfe_pod >> Edge(label="stores files") >> minio_pod
+    tfe_pod >> Edge(label="stores files") >> seaweedfs_pod
     tfe_pod >> Edge(label="caches sessions") >> redis_pod
