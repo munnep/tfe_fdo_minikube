@@ -49,46 +49,42 @@ variable "cloudflare_api_token" {
   type        = string
 }
 
-# Minio
-variable "minio_user" {
-  description = "Minio username."
+# SeaweedFS
+variable "seaweedfs_access_key" {
+  description = "SeaweedFS access key."
   type        = string
+  default = "admin"
 }
 
-variable "minio_password" {
-  description = "Minio password."
+variable "seaweedfs_secret_key" {
+  description = "SeaweedFS secret key."
   type        = string
+  default = "password"
 }
 
-variable "minio_access_key" {
-  description = "Minio access key."
+variable "image_seaweedfs" {
+  description = "SeaweedFS docker image."
   type        = string
-}
-
-variable "minio_secret_key" {
-  description = "Minio secret key."
-  type        = string
-}
-
-variable "image_minio" {
-  description = "Minio docker image."
-  type        = string
+  default = "docker.io/chrislusf/seaweedfs:4.09"
 }
 
 # Postgres
 variable "postgres_user" {
   description = "Postgres username."
   type        = string
+  default = "postgres"
 }
 
 variable "postgres_password" {
   description = "Postgres password."
   type        = string
+  default     = "postgresql"
 }
 
 variable "postgres_db" {
   description = "Postgres database name."
   type        = string
+  default     = "postgres"
 }
 
 variable "postgres_db_explorer" {
@@ -100,12 +96,14 @@ variable "postgres_db_explorer" {
 variable "image_postgres" {
   description = "Postgres docker image."
   type        = string
+  default     = "docker.io/library/postgres:16"
 }
 
 # Redis
 variable "image_redis" {
   description = "Redis docker image."
   type        = string
+  default     = "docker.io/library/redis:7"
 }
 
 # Squid

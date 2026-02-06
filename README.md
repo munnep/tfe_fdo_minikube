@@ -9,14 +9,14 @@ The setup creates a production-like TFE environment using modern containerizatio
 - **🖥️ Local Development**: Runs entirely on macOS using Podman Desktop plus a local Minikube Kubernetes cluster (Podman driver)
 - **☁️ External Access**: Leverages Cloudflare tunnels for secure external connectivity without port forwarding
 - **🔒 Enterprise Security**: Includes proper SSL certificates and DNS management through Cloudflare
-- **📦 Microservices Architecture**: Deploys TFE alongside supporting services (PostgreSQL, MinIO, Redis) as Kubernetes pods inside Minikube
+- **📦 Microservices Architecture**: Deploys TFE alongside supporting services (PostgreSQL, SeaweedFS, Redis) as Kubernetes pods inside Minikube
 
 ## Key Components
 
 - **Minikube**: Lightweight local Kubernetes cluster using the Podman driver and CRI-O container runtime
 - **Terraform Enterprise**: Full TFE installation with persistent storage and session management
 - **Cloudflare Integration**: Automated DNS records and secure tunnel connections for external access
-- **Supporting Services**: PostgreSQL (database), MinIO (S3-compatible storage), Redis (caching), and cloudflared (tunnel agent)
+- **Supporting Services**: PostgreSQL (database), SeaweedFS (S3-compatible storage), Redis (caching), and cloudflared (tunnel agent)
 
 ## Prerequisites
 
@@ -83,7 +83,7 @@ minikube stop -p tfe
 This will put the config in kubectl automatically so the kubernetes provider can use it.  
 Add the full path of the config file to the variable `kubectl_config_path` in `variables.auto.tfvars`
 
-If you want to access Minio and Postgres (locally) you will need to start a Minikube tunnel.  
+If you want to access SeaweedFS and Postgres (locally) you will need to start a Minikube tunnel.  
 This can be done with the following command:  
 ```
 sudo minikube tunnel --profile=tfe
@@ -145,9 +145,7 @@ Outputs:
    cloudflare_login_command = "cloudflared login"
    minikube_delete_cluster = "minikube delete --profile=tfe"
    minikube_tunnel = "sudo minikube tunnel --profile=tfe"
-   minio_console_url = "http://localhost:9001/"
-   minio_password = "minioadmin123456"
-   minio_user = "minioadmin"
+   seaweedfs_filer_url = "http://localhost:8888/"
    postgres_url = "postgresql://postgres:postgresql@localhost:5432/postgres"
    tfe_execute_script_to_create_user_admin = "./scripts/configure_tfe.sh tfe1.munnep.com patrick.munne@ibm.com admin secret$321"
    tfe_url = "https://tfe1.munnep.com"
