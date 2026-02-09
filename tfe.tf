@@ -39,8 +39,8 @@ resource "helm_release" "tfe" {
       pg_address          = "${kubernetes_service_v1.postgres.metadata[0].name}.${kubernetes_namespace_v1.terraform_enterprise.metadata.0.name}.svc.cluster.local:${kubernetes_service_v1.postgres.spec[0].port[0].port}"
       fqdn                = local.fqdn
       s3_bucket           = "${var.tag_prefix}-bucket"
-      s3_bucket_key       = "admin"
-      s3_bucket_secret    = "password"
+      s3_bucket_key       = var.seaweedfs_access_key
+      s3_bucket_secret    = var.seaweedfs_secret_key
       s3_endpoint         = "http://${kubernetes_service_v1.seaweedfs.metadata[0].name}.${kubernetes_namespace_v1.terraform_enterprise.metadata.0.name}.svc.cluster.local:${kubernetes_service_v1.seaweedfs.spec[0].port[0].port}"
       cert_data           = base64encode("${acme_certificate.certificate.certificate_pem}${acme_certificate.certificate.issuer_pem}")
       key_data            = base64encode(nonsensitive(acme_certificate.certificate.private_key_pem))
