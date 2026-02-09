@@ -91,6 +91,11 @@ sudo minikube tunnel --profile=tfe
 The name you enter at `--profile` must match the name you used in the start command with `-p`, here `tfe`.
 The tunnel will automatically detect all services defined as type Loadbalancer and expose them on localhost.
 
+Have the performance metrics enabled
+```
+minikube addons enable metrics-server -p tfe
+```
+
 ## View in Podman Desktop
 Under the Containers section you can now see your created container, named `tfe`.
 ![](media/2025-10-27-14-18-58.png)  
@@ -129,13 +134,35 @@ Copy the token and enter it as the value for `cloudflare_api_token`.
 
 
 # Terraform Enterprise
-Check the `variables.auto.tfvars` file and adjust all settings to your needs.  
+- Create a file called `variables.auto.tfvars` file and adjust all settings to your needs.  
 
+```
+# General
+route53_zone        = "munnep.com"                     # Main domain for Route53
+route53_subdomain   = "tfe1"                           # Subdomain for TFE
+cert_email          = "patrick.munne@ibm.com"          # Email for certificate generation
+   
+
+# Cloudflare
+cloudflare_account_id = "xxxxxx"                       # Cloudflare account ID
+cloudflare_api_token  = "xxxxxx"                       # API token for Cloudflare
+
+# TFE
+admin_username          = "admin"                      # Username for TFE admin user
+admin_email             = "patrick.munne@ibm.com"      # Email for TFE admin user
+admin_password          = "secret$321"                 # Password for TFE admin user
+tfe_encryption_password = "secret$321"                 # Encryption password for TFE
+release_sequence        = "1.0.2"                      # TFE release sequence
+tfe_raw_license         = "xxxxxxxx"                   # License string for TFE
+```
+
+- Build the environment using the code
 ```
 terraform init  
 terraform apply  
 ```
 
+- output example
 ```
 Plan: 22 to add, 0 to change, 0 to destroy.
 
@@ -174,4 +201,3 @@ Add the variable
 ```
 enable_proxy = true
 ```
-
