@@ -74,7 +74,7 @@ env:
     # proxy settings
     http_proxy: http://${tag_prefix}-squid:3128
     https_proxy: http://${tag_prefix}-squid:3128
-    no_proxy: localhost,127.0.0.1,169.254.169.24,${fqdn},${tag_prefix}-minio.${namespace}.svc.cluster.local
+    no_proxy: localhost,127.0.0.1,169.254.169.24,${fqdn},${tag_prefix}-seaweedfs.${namespace}.svc.cluster.local
 %{ endif ~}
     
 
