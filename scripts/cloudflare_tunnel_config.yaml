@@ -12,5 +12,7 @@ ingress:
     service: https://terraform-enterprise:443
   - hostname: admin-${fqdn}                        # cloudflare cannot use subdomains. Do not try admin.sub.domain.com
     service: https://terraform-enterprise:8446    
-  # Catch-all rule
+  - hostname: mcp-${fqdn}
+    service: http://tfe-terraform-mcp:8080
+  # Catch-all rule must be last
   - service: http_status:404

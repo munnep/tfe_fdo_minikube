@@ -84,7 +84,7 @@ variable "postgres_password" {
 variable "postgres_db" {
   description = "Postgres database name."
   type        = string
-  default     = "postgres"
+  default     = "tfe"
 }
 
 variable "postgres_db_explorer" {
@@ -99,6 +99,18 @@ variable "image_postgres" {
   default     = "docker.io/library/postgres:16"
 }
 
+variable "image_pgbouncer" {
+  description = "PgBouncer docker image."
+  type        = string
+  default     = "docker.io/edoburu/pgbouncer:v1.25.1-p0"
+}
+
+variable "image_haproxy" {
+  description = "HAProxy docker image."
+  type        = string
+  default     = "docker.io/library/haproxy:2.8.18"
+}
+
 # Redis
 variable "image_redis" {
   description = "Redis docker image."
@@ -111,6 +123,19 @@ variable "image_squid" {
   description = "Squid proxy docker image."
   type        = string
   default     = "docker.io/ubuntu/squid:latest"
+}
+
+# AWS
+variable "aws_region" {
+  description = "AWS region where the S3 bucket is created."
+  type        = string
+  default     = "eu-west-1"
+}
+
+variable "aws_s3_bucket_prefix" {
+  description = "Prefix used for the S3 bucket name."
+  type        = string
+  default     = "tfe-bucket"
 }
 
 variable "enable_proxy" {
@@ -166,5 +191,55 @@ variable "replica_count" {
   description = "Number of replicas (pods)."
   type        = number
   default     = 1
+}
+
+# MCP server
+variable "enable_mcp_server" {
+  description = "Enable deployment of a Terraform MCP server pod."
+  type        = bool
+  default     = true
+}
+
+variable "mcp_image" {
+  description = "Container image for the Terraform MCP server."
+  type        = string
+  default     = "docker.io/hashicorp/terraform-mcp-server:1.0.0"
+}
+
+variable "mcp_port" {
+  description = "Port used by the Terraform MCP server container and service."
+  type        = number
+  default     = 8080
+}
+
+variable "mcp_log_level" {
+  description = "Log level for the Terraform MCP server."
+  type        = string
+  default     = "info"
+}
+
+variable "mcp_tfe_address" {
+  description = "Terraform Enterprise address used by the MCP server."
+  type        = string
+  default     = "https://tfe1.munnep.com"
+}
+
+variable "mcp_tfe_token" {
+  description = "Terraform Enterprise token used by the MCP server."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "mcp_service_type" {
+  description = "Kubernetes Service type for the MCP server."
+  type        = string
+  default     = "ClusterIP"
+}
+
+variable "mcp_endpoint" {
+  description = "HTTP endpoint path exposed by the MCP server."
+  type        = string
+  default     = "/mcp"
 }
 

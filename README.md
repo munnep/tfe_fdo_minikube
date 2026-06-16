@@ -47,13 +47,13 @@ Once installed, start the app and setup a podman machine with 6cpu, 12GB mem and
 
 Example:
 ```
-podman machine init --cpus 8 --memory 12000 --disk-size 100
+podman machine init --cpus 8 --memory 12000 --disk-size 150
 ```
 
 Alter it if needed
 ```
 podman machine stop
-podman machine set --cpus 6 --memory 8192 --disk-size 150
+podman machine set --cpus 8 --memory 12000 --disk-size 150
 ```
 
 
@@ -72,7 +72,7 @@ minikube config set driver podman
 
 Start minikube with additional parameters:  
 ```
-minikube start -p tfe --driver=podman --container-runtime=cri-o --kubernetes-version=v1.34.0 --cpus=4 --memory=8192
+minikube start -p tfe --driver=podman --container-runtime=cri-o --kubernetes-version=v1.34.0 --cpus=6 --memory=10192
 ```
 
 Stop minikube:  
@@ -192,6 +192,32 @@ The UI interface cloudflare tunnel:
 Also the Minikube cluster must be deleted manually.  
 `minikube delete -p tfe`  
 
+## MCP Server (Summary)
+
+This environment can expose an MCP endpoint so tools and agents can interact with Terraform Enterprise through a standard Model Context Protocol API.
+
+- Endpoint: `https://mcp-<your-tfe-host>/mcp` (example: `https://mcp-tfe1.munnep.com/mcp`)
+- Auth: send `TFE_TOKEN` in the request headers
+- Common use cases: search workspaces, inspect runs, create runs, and apply or discard runs through MCP tools
+
+Security note: keep your TFE token in environment variables or a secure secret store, and never commit it to git.
+
+Example configuration for vscode
+```
+{
+  "servers": {
+    "terraform-mcp-server": {
+      "url": "https://mcp-tfe1.munnep.com/mcp",
+      "type": "http",
+      "headers": {
+        "TFE_TOKEN": "xxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    }
+  },
+  "inputs": []
+}
+```
+
 
 ## Proxy pod (squid server)
 
@@ -201,3 +227,4 @@ Add the variable
 ```
 enable_proxy = true
 ```
+

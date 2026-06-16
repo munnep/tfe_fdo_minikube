@@ -38,6 +38,15 @@ resource "cloudflare_dns_record" "tunnel_dns_admin" {
   proxied = true
 }
 
+# Create the DNS record pointing to the tunnel
+resource "cloudflare_dns_record" "tunnel_dns_mcp" {
+  zone_id = data.cloudflare_zones.main.result.0.id
+  name    = "mcp-${local.fqdn}"
+  type    = "CNAME"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.tfe_tunnel.id}.cfargotunnel.com"
+  ttl     = 1
+  proxied = true
+}
 # Kubernetes deployment for cloudflared tunnel
 # Secret containing tunnel information
 resource "kubernetes_secret_v1" "tunnel_credentials" {
@@ -113,6 +122,10 @@ resource "kubernetes_pod_v1" "cloudflared" {
         name = kubernetes_config_map_v1.tunnel_config.metadata[0].name
       }
     }
+  }
+
+  lifecycle {
+    replace_triggered_by = [kubernetes_config_map_v1.tunnel_config]
   }
 }
 

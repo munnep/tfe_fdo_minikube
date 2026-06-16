@@ -39,6 +39,8 @@ resource "kubernetes_config_map_v1" "postgres_init" {
       psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
         CREATE DATABASE ${var.postgres_db_explorer};
         GRANT ALL PRIVILEGES ON DATABASE ${var.postgres_db_explorer} TO $POSTGRES_USER;
+        CREATE DATABASE tfe;
+        GRANT ALL PRIVILEGES ON DATABASE tfe TO $POSTGRES_USER;
       EOSQL
     EOF
   }
@@ -111,9 +113,10 @@ resource "kubernetes_pod_v1" "postgres" {
 
     volume {
       name = "pgdata"
-      persistent_volume_claim {
-        claim_name = kubernetes_persistent_volume_claim_v1.postgres.metadata[0].name
-      }
+      # persistent_volume_claim {
+      #   claim_name = kubernetes_persistent_volume_claim_v1.postgres.metadata[0].name
+      # }
+      empty_dir {}
     }
     volume {
       name = "init-scripts"

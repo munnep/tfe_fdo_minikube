@@ -24,7 +24,7 @@ resource "helm_release" "tfe" {
   repository      = "https://helm.releases.hashicorp.com"
   chart           = "terraform-enterprise"
   namespace       = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
-  version         = "1.6.5"
+  version         = "1.6.8"
   cleanup_on_fail = true
 
 
@@ -55,7 +55,7 @@ resource "helm_release" "tfe" {
     })
   ]
 
-  timeout = 500
+  timeout = 300
 }
 
 output "tfe_execute_script_to_create_user_admin" {
