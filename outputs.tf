@@ -5,5 +5,9 @@ output "minikube_tunnel" {
 }
 
 output "minikube_delete_cluster" {
-  value = "minikube delete --profile=tfe"  
+  value = "minikube delete --profile=tfe"
+}
+
+output "grafana_url" {
+  value = var.enable_monitoring ? "https://grafana-${local.fqdn}" : "monitoring disabled"
 }

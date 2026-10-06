@@ -47,13 +47,13 @@ Once installed, start the app and setup a podman machine with 6cpu, 12GB mem and
 
 Example:
 ```
-podman machine init --cpus 8 --memory 12000 --disk-size 150
+podman machine init --cpus 12 --memory 16000 --disk-size 250
 ```
 
 Alter it if needed
 ```
 podman machine stop
-podman machine set --cpus 8 --memory 12000 --disk-size 150
+podman machine set --cpus 12 --memory 16000 --disk-size 260
 ```
 
 
@@ -72,7 +72,7 @@ minikube config set driver podman
 
 Start minikube with additional parameters:  
 ```
-minikube start -p tfe --driver=podman --container-runtime=cri-o --kubernetes-version=v1.34.0 --cpus=6 --memory=10192
+minikube start -p tfe --driver=podman --container-runtime=cri-o --kubernetes-version=v1.37.0 --cpus=6 --memory=10192
 ```
 
 Stop minikube:  
@@ -94,6 +94,12 @@ The tunnel will automatically detect all services defined as type Loadbalancer a
 Have the performance metrics enabled
 ```
 minikube addons enable metrics-server -p tfe
+```
+
+If above fails use the following
+```
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl patch deployment metrics-server -n kube-system \ --type='json' \ -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 ```
 
 ## View in Podman Desktop
@@ -196,6 +202,7 @@ Also the Minikube cluster must be deleted manually.
 
 This environment can expose an MCP endpoint so tools and agents can interact with Terraform Enterprise through a standard Model Context Protocol API.
 
+- Health check endpoint https://mcp-tfe1.munnep.com/health
 - Endpoint: `https://mcp-<your-tfe-host>/mcp` (example: `https://mcp-tfe1.munnep.com/mcp`)
 - Auth: send `TFE_TOKEN` in the request headers
 - Common use cases: search workspaces, inspect runs, create runs, and apply or discard runs through MCP tools
@@ -228,3 +235,45 @@ Add the variable
 enable_proxy = true
 ```
 
+logs
+kubectl exec -n terraform-enterprise tfe-squid -- tail -f /var/log/squid/access.log
+
+## Monitoring (Prometheus + Grafana)
+
+Prometheus and Grafana are deployed automatically alongside TFE and are enabled by default (`enable_monitoring = true`).
+
+To disable, add the following to `variables.auto.tfvars`:
+```
+enable_monitoring = false
+```
+
+**Grafana** is accessible at `https://grafana-<your-tfe-host>` (example: `https://grafana-tfe1.munnep.com`).
+Default login: `admin` / `admin`.
+
+The Prometheus datasource is provisioned automatically — no manual configuration needed.
+
+**Import the TFE dashboard:**
+1. Go to **Dashboards → Import**
+2. Enter ID **15630** and click **Load**
+3. Select the **Prometheus** datasource and click **Import**
+
+> **Note:** Dashboard 15630 was designed for TFE standalone (Replicated). On Kubernetes/FDO, `tfe_container_*` metrics are not emitted, so panels relying on those will show no data. Panels for runs, queue depth, and Sidekiq workers (`tfe_run_*`, `tfe_sidekiq_*`) will show data correctly.
+
+
+## Issues related to DNS
+
+Edit
+```
+kubectl edit configmap coredns -n kube-system
+```
+Change:
+```
+forward . /etc/resolv.conf
+```
+to:
+```
+        forward . 8.8.8.8 8.8.4.4 {
+           max_concurrent 1000
+        }
+```
+Restart your entire laptop afterwards. Things should work properly

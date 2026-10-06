@@ -12,7 +12,11 @@ resource "kubernetes_config_map_v1" "squid" {
       # Port configuration
       http_port 3128
 
-      # Access control - allow all (restrict in production!)
+      # Block specific destinations
+      acl blocked_domains dstdomain tfe1.munnep.com
+      http_access deny blocked_domains
+
+      # Access control - allow all other traffic
       acl all src all
       http_access allow all
 

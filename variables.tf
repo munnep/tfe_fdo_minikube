@@ -49,6 +49,12 @@ variable "cloudflare_api_token" {
   type        = string
 }
 
+variable "tfe_helm_chart_version" {
+  description = "Version of the terraform-enterprise Helm chart."
+  type        = string
+  default     = "v2.0.4"
+}
+
 # SeaweedFS
 variable "seaweedfs_access_key" {
   description = "SeaweedFS access key."
@@ -122,7 +128,8 @@ variable "image_redis" {
 variable "image_squid" {
   description = "Squid proxy docker image."
   type        = string
-  default     = "docker.io/ubuntu/squid:latest"
+  # default     = "docker.io/ubuntu/squid:latest"
+  default     = "docker.io/ubuntu/squid:7.2-26.04_edge"
 }
 
 # AWS
@@ -231,6 +238,12 @@ variable "mcp_tfe_token" {
   default     = ""
 }
 
+variable "tfe_helm_release_timeout" {
+  description = "Timeout for the TFE Helm release."
+  type        = number
+  default     = 300
+}
+
 variable "mcp_service_type" {
   description = "Kubernetes Service type for the MCP server."
   type        = string
@@ -243,3 +256,22 @@ variable "mcp_endpoint" {
   default     = "/mcp"
 }
 
+
+# Monitoring
+variable "enable_monitoring" {
+  description = "Enable Prometheus and Grafana monitoring stack."
+  type        = bool
+  default     = true
+}
+
+variable "image_prometheus" {
+  description = "Prometheus container image."
+  type        = string
+  default     = "docker.io/prom/prometheus:v3.4.0"
+}
+
+variable "image_grafana" {
+  description = "Grafana container image."
+  type        = string
+  default     = "docker.io/grafana/grafana:11.6.1"
+}
