@@ -23,7 +23,7 @@ variable "kubectl_config_path" {
 variable "kubectl_context" {
   description = "The context to use within the kube config file."
   type        = string
-  default     = "tfe"
+  default     = "minikube"
 }
 
 variable "namespace" {
@@ -275,3 +275,30 @@ variable "image_grafana" {
   type        = string
   default     = "docker.io/grafana/grafana:11.6.1"
 }
+
+
+
+variable "tfe_beta_release" {
+  description = "trying to install a beta release version"
+  type        = bool
+  default     = false
+}
+
+variable "beta_registry_images_url" {
+  description = "URL for the images registry to download docker tfe image."
+  type        = string
+  default     = "tf-enterprise-docker-local.artifactory.hashicorp.engineering"
+}
+
+variable "tfe_beta_release_user" {
+  description = "Beta release user for login registry"
+  type        = string
+  default = "gh-tf-enterprise-ro"
+}
+
+variable "tfe_beta_release_password" {
+  description = "Beta release user for login registry"
+  type        = string
+  default = "very_secret"
+}
+

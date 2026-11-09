@@ -1,3 +1,11 @@
+locals {
+  effective_registry_url      = var.tfe_beta_release ? var.beta_registry_images_url : var.registry_images_url
+  effective_registry_username = var.tfe_beta_release ? var.tfe_beta_release_user : var.registry_username
+  effective_registry_password = var.tfe_beta_release ? var.tfe_beta_release_password : var.tfe_raw_license
+
+  # redis_host = var.use_valkey ? "${var.tag_prefix}-valkey.${var.dep_namespace}" : "${var.tag_prefix}-redis.${var.dep_namespace}"
+}
+
 resource "kubernetes_secret_v1" "terraform-enterprise" {
   metadata {
     name      = "terraform-enterprise"
@@ -7,10 +15,10 @@ resource "kubernetes_secret_v1" "terraform-enterprise" {
   data = {
     ".dockerconfigjson" = jsonencode({
       auths = {
-        (var.registry_images_url) = {
-          "username" = var.registry_username
-          "password" = var.tfe_raw_license
-          "auth"     = base64encode("${var.registry_username}:${var.tfe_raw_license}")
+        (local.effective_registry_url) = {
+          "username" = local.effective_registry_username
+          "password" = local.effective_registry_password
+          "auth"     = base64encode("${local.effective_registry_username}:${local.effective_registry_password}")
         }
       }
     })
@@ -18,13 +26,13 @@ resource "kubernetes_secret_v1" "terraform-enterprise" {
 }
 
 
-
 resource "helm_release" "tfe" {
   name            = "${var.tag_prefix}-tfe"
   repository      = "https://helm.releases.hashicorp.com"
   chart           = "terraform-enterprise"
+  # chart           = "/Users/patrick/git/TFE/terraform-enterprise-helm2"
   namespace       = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
-  version         = "1.6.8"
+  version         = var.tfe_helm_chart_version
   cleanup_on_fail = true
 
 
@@ -49,13 +57,14 @@ resource "helm_release" "tfe" {
       redis_port          = "6379"
       tfe_license         = var.tfe_raw_license
       tfe_release         = var.release_sequence
-      registry_images_url = var.registry_images_url
+      tfe_beta_release    = var.tfe_beta_release
+      registry_images_url = local.effective_registry_url
       enable_proxy        = var.enable_proxy
       namespace           = kubernetes_namespace_v1.terraform_enterprise.metadata.0.name
     })
   ]
 
-  timeout = 300
+  timeout = var.tfe_helm_release_timeout
 }
 
 output "tfe_execute_script_to_create_user_admin" {

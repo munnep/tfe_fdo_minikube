@@ -1,8 +1,9 @@
 replicaCount: ${replica_count}
 image:
   repository: ${registry_images_url}
-  name: hashicorp/terraform-enterprise
+  name: ${ tfe_beta_release ? "terraform-enterprise" : "hashicorp/terraform-enterprise" }
   tag: ${tfe_release}
+  pullPolicy: IfNotPresent
 
 resources:
   requests:
@@ -16,6 +17,15 @@ service:
   annotations:
   type: ClusterIP
 
+tfe:
+  metrics:
+    enable: true
+    httpPort: 9090
+    httpsPort: 9091
+  readinessProbePath: "/api/v1/health/readiness?timeout=8"
+  readinessProbeTimeoutSeconds: 8
+  readinessProbePeriodSeconds: 8
+  readinessProbeFailureThreshold: 8
 
 agentWorkerPodTemplate:
   metadata:
@@ -24,23 +34,34 @@ agentWorkerPodTemplate:
       version: default
   spec:
     containers:
-    - securityContext:
-        allowPrivilegeEscalation: false
-        capabilities:
-          drop:
-          - ALL
-        seccompProfile:
-          type: RuntimeDefault
+    - image: docker.io/patrickmunne3/custom-agent:v1.42
+      # securityContext:
+      #   allowPrivilegeEscalation: false
+      #   capabilities:
+      #     drop:
+      #     - ALL
+      #   seccompProfile:
+      #     type: RuntimeDefault
+      # resources:
+      #   requests:
+      #     memory: "512Mi"
+      #     cpu: "500m"
+      #   limits:
+      #     memory: "1024Mi"
+      #     cpu: "2"
       # Use the full Docker Hub path for minikube compatibility
-      image: docker.io/hashicorp/tfc-agent:latest
+      # image: docker.io/hashicorp/tfc-agent:latest
+      # image: docker.io/patrickmunne3/custom-agent:latest
+
 
 env:  
   variables:
     TFE_USE_SUPERVISORD: true
-    TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE: terraform-enterprise
+    # TFE_RUN_PIPELINE_KUBERNETES_NAMESPACE: terraform-enterprise
     TFE_CAPACITY_CONCURRENCY: 6
-    TFE_CAPACITY_MEMORY: 1024
+    # TFE_CAPACITY_MEMORY: 1024
     TFE_CAPACITY_CPU: 2
+    TFE_CAPACITY_MEMORY: 1024
     TFE_HOSTNAME: ${fqdn}
     TFE_OPERATIONAL_MODE: active-active
 
@@ -64,6 +85,11 @@ env:
     TFE_OBJECT_STORAGE_S3_ENDPOINT: ${s3_endpoint}
     TFE_OBJECT_STORAGE_S3_USE_INSTANCE_PROFILE: false
     TFE_ATLAS_REGISTRY_MONOREPO_TOGGLE_ENABLED: 1
+    TFE_STARTUP_CHECKS_IGNORE_FAILURES: "archivist"
+
+    # TFE_RUN_PIPELINE_IMAGE: docker.io/hashicorp/tfc-agent:latest
+
+    TFE_ADMIN_CONSOLE_ACCESS_MODE: both
 
     
     TFE_REDIS_HOST: ${redis_host}:${redis_port}
@@ -74,12 +100,14 @@ env:
     # sometimes nessecary for Vault to work properly. Not needed for minikube
     # TFE_VAULT_CLUSTER_ADDRESS: http://{{GetAllInterfaces | include \"type\" \"ip\" | include \"flags\" \"up\" | exclude \"flags\" \"loopback\" |  sort \"default,type,size\" | include \"RFC\" \"6890\" | attr \"address\" }}:8201
     
-# %{ if enable_proxy ~}
-#     # proxy settings
-#     http_proxy: http://${tag_prefix}-squid:3128
-#     https_proxy: http://${tag_prefix}-squid:3128
-#     no_proxy: localhost,127.0.0.1,169.254.169.24,${fqdn},${tag_prefix}-seaweedfs.${namespace}.svc.cluster.local
-# %{ endif ~}
+%{ if enable_proxy ~}
+    # proxy settings
+    http_proxy: http://${tag_prefix}-squid.${namespace}.svc.cluster.local:3128
+    https_proxy: http://${tag_prefix}-squid.${namespace}.svc.cluster.local:3128
+    no_proxy: localhost,127.0.0.1,169.254.169.24,${fqdn},${tag_prefix}-seaweedfs.${namespace}.svc.cluster.local # working
+    # no_proxy: localhost,127.0.0.1,169.254.169.24,${tag_prefix}-seaweedfs.${namespace}.svc.cluster.local
+    # no_proxy: localhost,127.0.0.1,169.254.169.24,${fqdn},${tag_prefix}-seaweedfs.${namespace}.svc.cluster.local
+%{ endif ~}
     
 
 
@@ -88,10 +116,15 @@ env:
     TFE_ENCRYPTION_PASSWORD:  ${enc_password}
     TFE_LICENSE: ${tfe_license} 
 
+# tfe:
+#   readinessProbePath: "/api/v1/health/readiness?timeout=5"
+#   readinessProbeTimeoutSeconds: 9
+#   readinessProbePeriodSeconds: 19
+#   readinessProbeFailureThreshold: 9
+
 tls:
   certData: ${cert_data}
   keyData: ${key_data}
   caCertData: ${ca_cert_data}
-
 
   
